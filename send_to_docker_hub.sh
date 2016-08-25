@@ -19,7 +19,7 @@ if [ -n "$TRAVIS_TAG" ] && [[ "${TRAVIS_TAG}" =~ ([0-9]+). ]]; then
 	fi
 fi
 
-if [ "${TRAVIS_GO_VERSION}" = "${GO_FOR_RELEASE}" ] && [ "${TRAVIS_BRANCH}" = "master" ]; then
+if [ "${TRAVIS_GO_VERSION}" = "${GO_FOR_RELEASE}" ]; then
 	cat > ~/.dockercfg <<EOF
 {
   "https://index.docker.io/v1/": {
@@ -28,9 +28,11 @@ if [ "${TRAVIS_GO_VERSION}" = "${GO_FOR_RELEASE}" ] && [ "${TRAVIS_BRANCH}" = "m
   }
 }
 EOF
-	tag_and_push $LATEST_TAG
-	tag_and_push $MAJOR_TAG
-	tag_and_push $VERSION_TAG
+	if [ "${TRAVIS_BRANCH}" = "master" ] || [ -n "$MAJOR_TAG" ]; then
+		tag_and_push $LATEST_TAG
+		tag_and_push $MAJOR_TAG
+		tag_and_push $VERSION_TAG
+	fi
 else
 	echo "No image to build"
 fi
